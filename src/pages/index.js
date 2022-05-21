@@ -8,7 +8,7 @@ const Component = ({ a, url }) => {
 	);
 };
 
-export const getPropsOnServer = async ({ url }) => {
+export const getPropsOnServer = ({ url }) => {
 	return { a: 5, url };
 };
 
