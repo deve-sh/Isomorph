@@ -3,6 +3,17 @@ import React from "react";
 import ReactDOM from "react-dom/server";
 import cookieParser from "cookie-parser";
 
+// Compilation dependencies, preloaded for faster builds
+import WrapperComponent from "./WrapperComponent";
+import streamToString from "./utils/streamToString";
+import getClientSideHydrationCode from "./utils/clientSideHydrationCode";
+import generateServerSideContext from "./utils/generateServerSideContext";
+
+const browserify = require("browserify");
+const tinyify = require("tinyify");
+const { transform: compileES6Code } = require("@babel/core");
+const compileCodeToStream = require("string-to-stream");
+
 const app = express();
 
 const nullFunction = () => ({});
@@ -27,16 +38,11 @@ app.get("*", async (req, res) => {
 			getPropsOnServer = nullFunction,
 			getComponentMeta = nullFunction,
 		} = ComponentExports;
-		const {
-			default: generateServerSideContext,
-		} = require("./utils/generateServerSideContext");
 		const context = generateServerSideContext(req, res);
-		let [initialProps, componentMeta, { default: WrapperComponent }] =
-			await Promise.all([
-				getPropsOnServer(context),
-				getComponentMeta(context),
-				import("./WrapperComponent"),
-			]);
+		let [initialProps, componentMeta] = await Promise.all([
+			getPropsOnServer(context),
+			getComponentMeta(context),
+		]);
 		const componentOutput = ReactDOM.renderToString(
 			<WrapperComponent
 				Component={ComponentDefault}
@@ -45,10 +51,6 @@ app.get("*", async (req, res) => {
 			/>
 		);
 
-		const { transform: compileES6Code } = require("@babel/core");
-		const {
-			default: getClientSideHydrationCode,
-		} = require("./utils/clientSideHydrationCode");
 		const clientSideHydrationCode = getClientSideHydrationCode(
 			pageImportPath,
 			initialProps
@@ -57,20 +59,16 @@ app.get("*", async (req, res) => {
 			clientSideHydrationCode
 		);
 
-		const browserify = require("browserify");
-		const compileCodeToStream = require("string-to-stream");
-		const browserifyInstance = browserify();
+		let browserifyInstance = browserify();
 
 		if (process.env.NODE_ENV === "production") {
 			// Tree shaking and minification + bundling of modules in production mode.
-			const tinyify = require("tinyify");
 			browserifyInstance = browserifyInstance.plugin(tinyify);
 		}
 
 		const pageBundle = browserifyInstance
 			.add(compileCodeToStream(compiledClientSideHydrationCode))
 			.bundle();
-		const { default: streamToString } = require("./utils/streamToString");
 		const bundleString = await streamToString(pageBundle);
 
 		res.send(`
@@ -89,7 +87,8 @@ app.get("*", async (req, res) => {
 				</body>
 			</html>
 		`);
-	} catch {
+	} catch (err) {
+		console.log(err);
 		// Todo: Add default _error component page for handling 500 errors too.
 		return res.sendStatus(500);
 	}
