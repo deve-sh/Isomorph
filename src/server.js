@@ -43,7 +43,7 @@ app.get("*", async (req, res) => {
 			<html>
 				<head>
 					<title>${componentMeta?.title || "App Rendered By Isomorph"}</title>
-					<script id="isomorph-data">${JSON.stringify(initialProps)}</script>
+					<script type="isomorph/data">${JSON.stringify(initialProps)}</script>
 				</head>
 				<body>
 					${componentOutput}
