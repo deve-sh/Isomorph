@@ -1,12 +1,13 @@
 import express from "express";
 import React from "react";
 import ReactDOM from "react-dom/server";
-import streamToString from "./utils/streamToString";
-import WrapperComponent from "./WrapperComponent";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 const nullFunction = () => ({});
+
+app.use(cookieParser());
 
 app.get("*", async (req, res) => {
 	const pageRoute = req.url;
@@ -26,10 +27,14 @@ app.get("*", async (req, res) => {
 			getPropsOnServer = nullFunction,
 			getComponentMeta = nullFunction,
 		} = ComponentExports;
-		const context = { url: req.url, req, res };
-		let [initialProps, componentMeta] = await Promise.all([
+		const {
+			default: generateServerSideContext,
+		} = require("./utils/generateServerSideContext");
+		const context = generateServerSideContext(req, res);
+		let [initialProps, componentMeta, WrapperComponent] = await Promise.all([
 			getPropsOnServer(context),
 			getComponentMeta(context),
+			import("./WrapperComponent"),
 		]);
 		const componentOutput = ReactDOM.renderToString(
 			<WrapperComponent
@@ -52,17 +57,19 @@ app.get("*", async (req, res) => {
 		);
 
 		const browserify = require("browserify");
-		const compiledCodeToStream = require("string-to-stream");
+		const compileCodeToStream = require("string-to-stream");
 		const browserifyInstance = browserify();
 
 		if (process.env.NODE_ENV === "production") {
+			// Tree shaking and minification + bundling of modules in production mode.
 			const tinyify = require("tinyify");
 			browserifyInstance = browserifyInstance.plugin(tinyify);
 		}
 
 		const pageBundle = browserifyInstance
-			.add(compiledCodeToStream(compiledClientSideHydrationCode))
+			.add(compileCodeToStream(compiledClientSideHydrationCode))
 			.bundle();
+		const { default: streamToString } = require("./utils/streamToString");
 		const bundleString = await streamToString(pageBundle);
 
 		res.send(`
