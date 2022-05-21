@@ -40,7 +40,7 @@ app.get("*", async (req, res) => {
 		if (isStaticPage) {
 			try {
 				// Follow the Stale-While-Revalidate approach, serve the static HTML saved first.
-				// Then later on
+				// Then later on, create the page and store the HTML back to the cache.
 				const cachedHtmlContentForStaticPage = readFileSync(
 					`./dist/staticpages/${pageImportPath}.html`,
 					{ encoding: "utf-8" }
