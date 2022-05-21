@@ -33,7 +33,11 @@ app.get("*", async (req, res) => {
 			getComponentMeta(context),
 		]);
 		const componentOutput = ReactDOM.renderToString(
-			<WrapperComponent Component={ComponentDefault} pageProps={initialProps} />
+			<WrapperComponent
+				Component={ComponentDefault}
+				pageMetaData={componentMeta}
+				pageProps={initialProps}
+			/>
 		);
 		res.send(`
 			<html>

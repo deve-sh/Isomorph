@@ -1,7 +1,7 @@
 import React from "react";
 
-const Component = ({ url }) => {
-	return <>Component rendered at URL: {url}</>;
+const Component = () => {
+	return <>Component rendered as trial page.</>;
 };
 
 export const getComponentMeta = () => {
