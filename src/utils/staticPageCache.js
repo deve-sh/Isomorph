@@ -15,7 +15,10 @@ const shouldPageRevalidate = (path, revalidationInterval) => {
 		return true; // Has to be revalidated and cached
 	}
 	const now = new Date().getTime();
-	if ((now - pageEntryInCache[path].getTime()) / 1000 > revalidationInterval) {
+	if (
+		(now - new Date(pageEntryInCache[path]).getTime()) / 1000 >
+		revalidationInterval
+	) {
 		// Time since last revalidation is more than the revalidation interval
 		staticPagesRevalidationCache[path] = new Date(now);
 		return true;

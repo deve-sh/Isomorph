@@ -1,13 +1,15 @@
 import express from "express";
 import React from "react";
-import ReactDOM from "react-dom/server";
+import { renderToString } from "react-dom/server";
 import cookieParser from "cookie-parser";
+import { outputFile, readFileSync } from "fs-extra";
 
 // Compilation dependencies, preloaded for faster builds
 import WrapperComponent from "./WrapperComponent";
 import streamToString from "./utils/streamToString";
 import getClientSideHydrationCode from "./utils/clientSideHydrationCode";
 import generateServerSideContext from "./utils/generateServerSideContext";
+import shouldStaticPageRevalidate from "./utils/staticPageCache";
 
 const browserify = require("browserify");
 const tinyify = require("tinyify");
@@ -33,17 +35,43 @@ app.get("*", async (req, res) => {
 		return res.sendStatus(404);
 	}
 	try {
+		const isStaticPage =
+			!ComponentExports.getPropsOnServer || ComponentExports.getStaticProps;
+		if (isStaticPage) {
+			try {
+				// Follow the Stale-While-Revalidate approach, serve the static HTML saved first.
+				// Then later on
+				const cachedHtmlContentForStaticPage = readFileSync(
+					`./dist/staticpages/${pageImportPath}.html`,
+					{ encoding: "utf-8" }
+				);
+				res.send(cachedHtmlContentForStaticPage);
+			} catch {}
+		}
+
 		const {
 			default: ComponentDefault, // The React component
 			getPropsOnServer = nullFunction,
+			getStaticProps = nullFunction,
 			getComponentMeta = nullFunction,
 		} = ComponentExports;
 		const context = generateServerSideContext(req, res);
-		let [initialProps, componentMeta] = await Promise.all([
+		let [initialProps, componentMeta, staticProps] = await Promise.all([
 			getPropsOnServer(context),
 			getComponentMeta(context),
+			getStaticProps(context),
 		]);
-		const componentOutput = ReactDOM.renderToString(
+
+		const shouldRunRestOfTheCode = !isStaticPage
+			? true
+			: shouldStaticPageRevalidate(
+					req.url,
+					staticProps?.revalidate || Infinity
+			  );
+
+		if (!shouldRunRestOfTheCode) return;
+
+		const componentOutput = renderToString(
 			<WrapperComponent
 				Component={ComponentDefault}
 				pageMetaData={componentMeta}
@@ -71,7 +99,7 @@ app.get("*", async (req, res) => {
 			.bundle();
 		const bundleString = await streamToString(pageBundle);
 
-		res.send(`
+		const pageHTMLGenerated = `
 			<html>
 				<head>
 					<title>${componentMeta?.title || "App Rendered By Isomorph"}</title>
@@ -86,11 +114,19 @@ app.get("*", async (req, res) => {
 					</script>
 				</body>
 			</html>
-		`);
+		`;
+
+		if (isStaticPage) {
+			// Write new HTML generated for this page to cache.
+			outputFile(
+				`./dist/staticpages/${pageImportPath}.html`,
+				pageHTMLGenerated
+			);
+		}
+		if (!res.headersSent) return res.send(pageHTMLGenerated);
 	} catch (err) {
-		console.log(err);
 		// Todo: Add default _error component page for handling 500 errors too.
-		return res.sendStatus(500);
+		if (!res.headersSent) return res.sendStatus(500);
 	}
 });
 
