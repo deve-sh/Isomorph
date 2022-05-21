@@ -1,6 +1,7 @@
 import express from "express";
 import React from "react";
 import ReactDOM from "react-dom/server";
+import streamToString from "./utils/streamToString";
 import WrapperComponent from "./WrapperComponent";
 
 const app = express();
@@ -9,14 +10,12 @@ const nullFunction = () => ({});
 
 app.get("*", async (req, res) => {
 	const pageRoute = req.url;
-	const pageImportPath = `./pages${
-		pageRoute.endsWith("/")
-			? pageRoute.slice(0, pageRoute.length - 1)
-			: pageRoute
+	const pageImportPath = `pages${
+		pageRoute.endsWith("/") ? pageRoute + "index" : pageRoute
 	}`;
 	let ComponentExports;
 	try {
-		ComponentExports = await import(pageImportPath);
+		ComponentExports = await import(`./${pageImportPath}`);
 	} catch {
 		// Todo: Add _error or default component file for 404 errors.
 		return res.sendStatus(404);
@@ -24,12 +23,12 @@ app.get("*", async (req, res) => {
 	try {
 		const {
 			default: ComponentDefault, // The React component
-			getPropsFromServerForComponent = nullFunction,
+			getPropsOnServer = nullFunction,
 			getComponentMeta = nullFunction,
 		} = ComponentExports;
 		const context = { url: req.url, req, res };
 		let [initialProps, componentMeta] = await Promise.all([
-			getPropsFromServerForComponent(context),
+			getPropsOnServer(context),
 			getComponentMeta(context),
 		]);
 		const componentOutput = ReactDOM.renderToString(
@@ -39,6 +38,33 @@ app.get("*", async (req, res) => {
 				pageProps={initialProps}
 			/>
 		);
+
+		const { transform: compileES6Code } = require("@babel/core");
+		const {
+			default: getClientSideHydrationCode,
+		} = require("./utils/clientSideHydrationCode");
+		const clientSideHydrationCode = getClientSideHydrationCode(
+			pageImportPath,
+			initialProps
+		);
+		const { code: compiledClientSideHydrationCode } = compileES6Code(
+			clientSideHydrationCode
+		);
+
+		const browserify = require("browserify");
+		const compiledCodeToStream = require("string-to-stream");
+		const browserifyInstance = browserify();
+
+		if (process.env.NODE_ENV === "production") {
+			const tinyify = require("tinyify");
+			browserifyInstance = browserifyInstance.plugin(tinyify);
+		}
+
+		const pageBundle = browserifyInstance
+			.add(compiledCodeToStream(compiledClientSideHydrationCode))
+			.bundle();
+		const bundleString = await streamToString(pageBundle);
+
 		res.send(`
 			<html>
 				<head>
@@ -46,7 +72,12 @@ app.get("*", async (req, res) => {
 					<script type="isomorph/data">${JSON.stringify(initialProps)}</script>
 				</head>
 				<body>
-					${componentOutput}
+					<div id="isomorph_root">
+						${componentOutput}
+					</div>
+					<script type="text/javascript">
+						${bundleString}
+					</script>
 				</body>
 			</html>
 		`);
