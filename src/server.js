@@ -31,11 +31,12 @@ app.get("*", async (req, res) => {
 			default: generateServerSideContext,
 		} = require("./utils/generateServerSideContext");
 		const context = generateServerSideContext(req, res);
-		let [initialProps, componentMeta, WrapperComponent] = await Promise.all([
-			getPropsOnServer(context),
-			getComponentMeta(context),
-			import("./WrapperComponent"),
-		]);
+		let [initialProps, componentMeta, { default: WrapperComponent }] =
+			await Promise.all([
+				getPropsOnServer(context),
+				getComponentMeta(context),
+				import("./WrapperComponent"),
+			]);
 		const componentOutput = ReactDOM.renderToString(
 			<WrapperComponent
 				Component={ComponentDefault}
