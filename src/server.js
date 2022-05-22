@@ -15,7 +15,6 @@ const babelConfig = require("../babel.config.json");
 
 const browserify = require("browserify");
 const tinyify = require("tinyify");
-const { transform: compileES6Code } = require("@babel/core");
 const compileCodeToStream = require("string-to-stream");
 
 const app = express();
