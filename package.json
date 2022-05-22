@@ -5,8 +5,9 @@
 	"main": "server.js",
 	"scripts": {
 		"build": "babel ./src --out-dir ./dist",
-		"build:watch": "babel --watch ./src --out-dir ./dist",
-		"dev": "concurrently \"npm run build:watch\" \"nodemon ./dist/server.js\""
+		"build:watch": "npm run build --watch",
+		"dev": "concurrently \"npm run build:watch\" \"nodemon ./dist/server.js\"",
+		"start": "node ./dist/server.js"
 	},
 	"keywords": [],
 	"author": "",
