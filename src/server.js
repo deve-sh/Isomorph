@@ -61,12 +61,12 @@ app.get("*", async (req, res) => {
 			default: ComponentDefault, // The React component
 			getPropsOnServer = nullFunction,
 			getStaticProps = nullFunction,
-			getComponentMeta = nullFunction,
+			getPageMeta = nullFunction,
 		} = ComponentExports;
 		const context = generateServerSideContext(req, res);
 		let [initialProps, componentMeta, staticProps] = await Promise.all([
 			getPropsOnServer(context),
-			getComponentMeta(context),
+			getPageMeta(context),
 			getStaticProps(context),
 		]);
 
