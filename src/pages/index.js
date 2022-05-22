@@ -1,6 +1,9 @@
 import React from "react";
+import useInitialData from "../hooks/useInitialData";
 
-const Component = ({ a, url }) => {
+const Component = () => {
+	const { a, url } = useInitialData();
+
 	return (
 		<>
 			Props passed from Server: {a} at URL: {url}

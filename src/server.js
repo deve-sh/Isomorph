@@ -126,7 +126,7 @@ app.get("*", async (req, res) => {
 			);
 		}
 		if (!res.headersSent) return res.send(pageHTMLGenerated);
-	} catch (err) {
+	} catch {
 		// Todo: Add default _error component page for handling 500 errors too.
 		if (!res.headersSent) return res.sendStatus(500);
 	}
