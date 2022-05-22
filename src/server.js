@@ -12,6 +12,7 @@ import streamToString from "./utils/streamToString";
 import getClientSideHydrationCode from "./utils/clientSideHydrationCode";
 import generateServerSideContext from "./utils/generateServerSideContext";
 import shouldStaticPageRevalidate from "./utils/staticPageCache";
+import generatePageMetaHTML from "./utils/generatePageMetaHTML";
 
 const babelConfig = require("../babel.config.json");
 
@@ -82,11 +83,7 @@ app.get("*", async (req, res) => {
 
 		const initialData = isStaticPage ? staticProps : initialProps;
 		const componentOutput = renderToString(
-			<WrapperComponent
-				Component={ComponentDefault}
-				pageMetaData={componentMeta}
-				pageProps={initialData}
-			/>
+			<WrapperComponent Component={ComponentDefault} pageProps={initialData} />
 		);
 
 		const clientSideHydrationCode = getClientSideHydrationCode(pageImportPath);
@@ -110,6 +107,7 @@ app.get("*", async (req, res) => {
 				<head>
 					<title>${componentMeta?.title || "App Rendered By Isomorph"}</title>
 					<script type="isomorph/data">${JSON.stringify(initialData)}</script>
+					${generatePageMetaHTML(componentMeta || {})}
 				</head>
 				<body>
 					<div id="isomorph_root">
