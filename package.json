@@ -2,7 +2,7 @@
 	"name": "isomorph",
 	"version": "1.0.0",
 	"description": "",
-	"main": "server.js",
+	"main": "src/server.js",
 	"scripts": {
 		"build": "babel ./src --out-dir ./.isomorph",
 		"build:watch": "babel --watch ./src --out-dir ./.isomorph",
@@ -30,5 +30,8 @@
 		"react-dom": "^18.1.0",
 		"string-to-stream": "^3.0.1",
 		"tinyify": "^3.0.0"
+	},
+	"bin": {
+		"isomorph-web": "./src/scripts/index.js"
 	}
 }
