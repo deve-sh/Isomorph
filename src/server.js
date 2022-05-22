@@ -76,7 +76,7 @@ app.get("*", async (req, res) => {
 			<WrapperComponent
 				Component={ComponentDefault}
 				pageMetaData={componentMeta}
-				pageProps={initialProps}
+				pageProps={isStaticPage ? staticProps : initialProps}
 			/>
 		);
 
@@ -100,7 +100,9 @@ app.get("*", async (req, res) => {
 			<html>
 				<head>
 					<title>${componentMeta?.title || "App Rendered By Isomorph"}</title>
-					<script type="isomorph/data">${JSON.stringify(initialProps)}</script>
+					<script type="isomorph/data">${JSON.stringify(
+						isStaticPage ? staticProps : initialProps
+					)}</script>
 				</head>
 				<body>
 					<div id="isomorph_root">
