@@ -1,6 +1,9 @@
 const getClientSideHydrationCode = (pageImportPath) => `
     import React from 'react';
     import ReactDOM from 'react-dom/client';
+
+    window.React = React;
+    
     import WrapperComponent from './dist/WrapperComponent';
     import PageComponent from './dist/${pageImportPath}';
     

@@ -1,4 +1,3 @@
-import React from "react";
 import useInitialData from "../hooks/useInitialData";
 
 const Component = () => {

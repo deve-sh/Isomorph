@@ -1,4 +1,3 @@
-import React from "react";
 import InitialDataContextProvider from "./InitialDataContextProvider";
 
 const WrapperComponent = ({ Component, pageProps }) => {
