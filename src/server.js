@@ -25,6 +25,9 @@ const nullFunction = () => ({});
 
 app.use(cookieParser());
 
+const isProd = process.env.NODE_ENV === "production";
+const isDev = !isProd;
+
 app.get("*", async (req, res) => {
 	const pageRoute = req.url;
 	const pageImportPath = `pages${
@@ -42,7 +45,7 @@ app.get("*", async (req, res) => {
 	try {
 		const isStaticPage =
 			!ComponentExports.getPropsOnServer || ComponentExports.getStaticProps;
-		if (isStaticPage) {
+		if (isStaticPage && isProd) {
 			try {
 				// Follow the Stale-While-Revalidate approach, serve the static HTML saved first.
 				// Then later on, create the page and store the HTML back to the cache.
@@ -67,12 +70,13 @@ app.get("*", async (req, res) => {
 			getStaticProps(context),
 		]);
 
-		const shouldRunRestOfTheCode = !isStaticPage
-			? true
-			: shouldStaticPageRevalidate(
-					req.url,
-					staticProps?.revalidate || Infinity
-			  );
+		const shouldRunRestOfTheCode =
+			!isStaticPage || isDev
+				? true
+				: shouldStaticPageRevalidate(
+						req.url,
+						staticProps?.revalidate || Infinity
+				  );
 
 		if (!shouldRunRestOfTheCode) return;
 
