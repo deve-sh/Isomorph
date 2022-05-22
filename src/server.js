@@ -32,8 +32,10 @@ app.get("*", async (req, res) => {
 	try {
 		ComponentExports = await import(`./${pageImportPath}`);
 	} catch {
-		// Todo: Add _error or default component file for 404 errors.
-		return res.sendStatus(404);
+		const { default: sendBackErrorResponse } = await import(
+			"./utils/sendBackErrorResponse"
+		);
+		return sendBackErrorResponse(res, 404, "Page Not Found");
 	}
 	try {
 		const isStaticPage =
@@ -122,9 +124,13 @@ app.get("*", async (req, res) => {
 			);
 		}
 		if (!res.headersSent) return res.send(pageHTMLGenerated);
-	} catch {
-		// Todo: Add default _error component page for handling 500 errors too.
-		if (!res.headersSent) return res.sendStatus(500);
+	} catch (err) {
+		if (res.headersSent) return;
+
+		const { default: sendBackErrorResponse } = await import(
+			"./utils/sendBackErrorResponse"
+		);
+		return sendBackErrorResponse(res, 500, err.message);
 	}
 });
 
