@@ -1,4 +1,4 @@
-const getClientSideHydrationCode = (pageImportPath, initialProps) => `
+const getClientSideHydrationCode = (pageImportPath) => `
     import React from 'react';
     import ReactDOM from 'react-dom/client';
     import WrapperComponent from './dist/WrapperComponent';

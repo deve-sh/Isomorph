@@ -81,11 +81,7 @@ app.get("*", async (req, res) => {
 			/>
 		);
 
-		const clientSideHydrationCode = getClientSideHydrationCode(
-			pageImportPath,
-			initialProps
-		);
-
+		const clientSideHydrationCode = getClientSideHydrationCode(pageImportPath);
 		let browserifyInstance = browserify().transform("babelify", {
 			presets: babelConfig.presets,
 			comments: babelConfig.comments,
