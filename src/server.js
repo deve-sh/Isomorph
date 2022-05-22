@@ -11,6 +11,8 @@ import getClientSideHydrationCode from "./utils/clientSideHydrationCode";
 import generateServerSideContext from "./utils/generateServerSideContext";
 import shouldStaticPageRevalidate from "./utils/staticPageCache";
 
+const babelConfig = require("../babel.config.json");
+
 const browserify = require("browserify");
 const tinyify = require("tinyify");
 const { transform: compileES6Code } = require("@babel/core");
@@ -83,11 +85,11 @@ app.get("*", async (req, res) => {
 			pageImportPath,
 			initialProps
 		);
-		const { code: compiledClientSideHydrationCode } = compileES6Code(
-			clientSideHydrationCode
-		);
 
-		let browserifyInstance = browserify();
+		let browserifyInstance = browserify().transform("babelify", {
+			presets: babelConfig.presets,
+			comments: babelConfig.comments,
+		});
 
 		if (process.env.NODE_ENV === "production") {
 			// Tree shaking and minification + bundling of modules in production mode.
@@ -95,7 +97,7 @@ app.get("*", async (req, res) => {
 		}
 
 		const pageBundle = browserifyInstance
-			.add(compileCodeToStream(compiledClientSideHydrationCode))
+			.add(compileCodeToStream(clientSideHydrationCode))
 			.bundle();
 		const bundleString = await streamToString(pageBundle);
 
