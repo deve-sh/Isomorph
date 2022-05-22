@@ -50,7 +50,7 @@ app.get("*", async (req, res) => {
 				// Follow the Stale-While-Revalidate approach, serve the static HTML saved first.
 				// Then later on, create the page and store the HTML back to the cache.
 				const cachedHtmlContentForStaticPage = readFileSync(
-					`./dist/staticpages/${pageImportPath}.html`,
+					`./.isomorph/staticpages/${pageImportPath}.html`,
 					{ encoding: "utf-8" }
 				);
 				res.send(cachedHtmlContentForStaticPage);
@@ -125,7 +125,7 @@ app.get("*", async (req, res) => {
 		if (isStaticPage) {
 			// Write new HTML generated for this page to cache.
 			outputFile(
-				`./dist/staticpages/${pageImportPath}.html`,
+				`./.isomorph/staticpages/${pageImportPath}.html`,
 				pageHTMLGenerated
 			);
 		}
