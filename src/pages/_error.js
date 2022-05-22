@@ -1,5 +1,3 @@
-import React from "react";
-
 const ErrorComponent = ({ statusCode, error }) => {
 	return (
 		<>

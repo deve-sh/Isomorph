@@ -4,6 +4,8 @@ import { renderToString } from "react-dom/server";
 import cookieParser from "cookie-parser";
 import { outputFile, readFileSync } from "fs-extra";
 
+global.React = React; // To be in scope by default for all pages. Without having to import React each time.
+
 // Compilation dependencies, preloaded for faster builds
 import WrapperComponent from "./WrapperComponent";
 import streamToString from "./utils/streamToString";
