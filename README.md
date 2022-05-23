@@ -51,7 +51,7 @@ Pages are simple React component files that expose a default React component exp
 
 ```javascript
 // No need to 'import React from "react";', it's always in scope.
-import useInitialData from "isomorph/useInitialData";
+import useInitialData from "isomorph/hooks/useInitialData";
 
 const PageComponent = () => {
 	const initialData = useInitialData(); // Use this hook to access data fetched for the page in getPropsOnServer/getStaticProps.
