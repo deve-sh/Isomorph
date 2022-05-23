@@ -13,6 +13,8 @@ import getClientSideHydrationCode from "./utils/clientSideHydrationCode";
 import generateServerSideContext from "./utils/generateServerSideContext";
 import shouldStaticPageRevalidate from "./utils/staticPageCache";
 import generatePageMetaHTML from "./utils/generatePageMetaHTML";
+import pageClientSideBundleExists from "./utils/pageClientSideBundleExists";
+import writeClientSidePageBundle from "./utils/writeClientSidePageBundle";
 
 const babelConfig = require("../babel.config.json");
 
@@ -28,6 +30,8 @@ app.use(cookieParser());
 
 const isProd = process.env.NODE_ENV === "production";
 const isDev = !isProd;
+
+app.use("/chunks", express.static(".isomorph/page-chunks"));
 
 app.get("*", async (req, res) => {
 	const pageRoute = req.url;
@@ -86,21 +90,34 @@ app.get("*", async (req, res) => {
 			<WrapperComponent Component={ComponentDefault} pageProps={initialData} />
 		);
 
-		const clientSideHydrationCode = getClientSideHydrationCode(pageImportPath);
-		let browserifyInstance = browserify().transform("babelify", {
-			presets: babelConfig.presets,
-			comments: babelConfig.comments,
-		});
-
-		if (process.env.NODE_ENV === "production") {
-			// Tree shaking and minification + bundling of modules in production mode.
-			browserifyInstance = browserifyInstance.plugin(tinyify);
+		// Time to generate the client-side bundle required to rehydrate/re-render the app on the client-side.
+		let clientSideBundleString;
+		if (isProd) {
+			// On Prod, check if there already exists a prebuilt page bundle.
+			// In case it does, there's no need to generate a new bundle for the page on each request.
+			const alreadyBuiltPageBundle = pageClientSideBundleExists(pageImportPath);
+			if (alreadyBuiltPageBundle) clientSideBundleString = true;
 		}
 
-		const pageBundle = browserifyInstance
-			.add(compileCodeToStream(clientSideHydrationCode))
-			.bundle();
-		const bundleString = await streamToString(pageBundle);
+		if (!clientSideBundleString) {
+			const clientSideHydrationCode =
+				getClientSideHydrationCode(pageImportPath);
+			let browserifyInstance = browserify().transform("babelify", {
+				presets: babelConfig.presets,
+				comments: babelConfig.comments,
+			});
+
+			if (isProd) {
+				// Tree shaking and minification + bundling of modules in production mode.
+				browserifyInstance = browserifyInstance.plugin(tinyify);
+			}
+
+			const pageBundle = browserifyInstance
+				.add(compileCodeToStream(clientSideHydrationCode))
+				.bundle();
+			clientSideBundleString = await streamToString(pageBundle);
+			writeClientSidePageBundle(pageImportPath, clientSideBundleString);
+		}
 
 		const pageHTMLGenerated = `
 			<html>
@@ -113,9 +130,8 @@ app.get("*", async (req, res) => {
 					<div id="isomorph_root">
 						${componentOutput}
 					</div>
-					<script type="text/javascript">
-						${bundleString}
-					</script>
+					<!-- Client Side Rehydration Chunk for the page -->
+					<script type="text/javascript" src="/chunks/${pageImportPath}.js"></script>
 				</body>
 			</html>
 		`;
