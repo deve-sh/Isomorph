@@ -1,4 +1,5 @@
-const generateServerSideContext = (req, res) => {
+const generateServerSideContext = (req, res, isStaticPage = false) => {
+	if (isStaticPage) return { env: process.env, url: req.url };
 	return {
 		req,
 		res,

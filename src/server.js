@@ -73,7 +73,7 @@ app.get("*", async (req, res) => {
 			getStaticProps = nullFunction,
 			getPageMeta = nullFunction,
 		} = ComponentExports;
-		const context = generateServerSideContext(req, res);
+		const context = generateServerSideContext(req, res, isStaticPage);
 		let [initialProps, componentMeta, staticProps] = await Promise.all([
 			getPropsOnServer(context),
 			getPageMeta(context),
