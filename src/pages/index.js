@@ -6,6 +6,8 @@ const Component = () => {
 	return (
 		<>
 			Props passed from Server: {a} at URL: {url}
+			<br />
+			Environment Variable: {process.env.ISOMORPH_PUBLIC_ENV_VAR}
 		</>
 	);
 };

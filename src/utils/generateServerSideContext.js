@@ -6,6 +6,7 @@ const generateServerSideContext = (req, res) => {
 		url: req.url,
 		query: req.query,
 		params: req.params,
+		env: process.env,
 	};
 };
 

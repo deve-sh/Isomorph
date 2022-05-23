@@ -1,3 +1,6 @@
+import { config } from "dotenv";
+config(); // Read and ready environment variables
+
 import express from "express";
 import React from "react";
 import { renderToString } from "react-dom/server";
@@ -15,11 +18,13 @@ import shouldStaticPageRevalidate from "./utils/staticPageCache";
 import generatePageMetaHTML from "./utils/generatePageMetaHTML";
 import pageClientSideBundleExists from "./utils/pageClientSideBundleExists";
 import writeClientSidePageBundle from "./utils/writeClientSidePageBundle";
+import processPublicEnvVars from "./utils/processPublicEnvVars";
 
 const babelConfig = require("../babel.config.json");
 
 const browserify = require("browserify");
 const tinyify = require("tinyify");
+const envify = require("envify/custom");
 const compileCodeToStream = require("string-to-stream");
 
 const app = express();
@@ -102,10 +107,12 @@ app.get("*", async (req, res) => {
 		if (!clientSideBundleString) {
 			const clientSideHydrationCode =
 				getClientSideHydrationCode(pageImportPath);
-			let browserifyInstance = browserify().transform("babelify", {
-				presets: babelConfig.presets,
-				comments: babelConfig.comments,
-			});
+			let browserifyInstance = browserify()
+				.transform("babelify", {
+					presets: babelConfig.presets,
+					comments: babelConfig.comments,
+				})
+				.transform(envify({ NODE_ENV: process.env.NODE_ENV }));
 
 			if (isProd) {
 				// Tree shaking and minification + bundling of modules in production mode.
@@ -130,6 +137,13 @@ app.get("*", async (req, res) => {
 					<div id="isomorph_root">
 						${componentOutput}
 					</div>
+					<!-- Public environment and browser variables to use later on the client-side if needed -->
+					<script type="text/javascript">
+						window.process = { 
+							browser: true, 
+							env: ${JSON.stringify(processPublicEnvVars())} 
+						};
+					</script>
 					<!-- Client Side Rehydration Chunk for the page -->
 					<script type="text/javascript" src="/chunks/${pageImportPath}.js"></script>
 				</body>
