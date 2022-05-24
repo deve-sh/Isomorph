@@ -69,7 +69,8 @@ export default PageComponent;
 // For server-rendered pages, for static pages, use getStaticProps or skip both of these data fetcher functions.
 export const getPropsOnServer = async (context) => {
 	console.log(
-        context.req, context.res,
+        context.req,
+		context.res,
         context.cookies, // Parsed cookie object for you
         context.env, // Environment variables, would not be exposed to the client.
         context.url // Request url path.
