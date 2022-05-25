@@ -49,7 +49,9 @@ app.get("*", async (req, res) => {
 		ComponentExports = await import(
 			resolve(process.cwd(), `./.isomorph/${pageImportPath}`)
 		);
-	} catch {
+		console.log("Working with Imported Page Module: ", ComponentExports);
+	} catch (err) {
+		console.error("Error In Importing Page Module: ", err);
 		const { default: sendBackErrorResponse } = await import(
 			"./utils/sendBackErrorResponse"
 		);
