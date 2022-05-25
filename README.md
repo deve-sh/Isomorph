@@ -2,13 +2,14 @@
 
 A simple framework inspired by [Next.js](https://nextjs.org/) to create Server and Statically Rendered React Apps.
 
-- [Starting An Isomorph Project](#work-in-progress)
+- [Starting An Isomorph Project](#installation-and-setup)
 - [Required Project Structure](#required-project-structure)
 - [Pages Structure and Data Fetching](#pages-structure-and-data-fetching)
 - [Handling Page Meta Data](#handling-page-meta-data)
 - [Determining When your page is on the client-side](#determining-when-your-page-is-on-the-client-side)
 - [Environment Variables](#environment-variables)
 - [Custom Error Pages](#custom-error-pages)
+- [Building and Serving to Production](#building-and-serving-on-production)
 
 #### Work In Progress
 
@@ -25,6 +26,46 @@ A simple framework inspired by [Next.js](https://nextjs.org/) to create Server a
 - Minification and Tree-Shaking of code in Production mode.
 - Bundle Caching in Production mode to enable super-fast load times for both server-rendered and statically generated pages post first build.
 - Custom error pages using `_error` for handling `404`s and `500`s.
+
+### Installation and Setup
+
+As of now to setup an isomorph project, create a directory for your project. I'm assuming you have npm and Node.js already installed.
+
+```
+mkdir my-isomorph-project
+cd ./my-isomorph-project
+npm init -y
+```
+
+Once done with this, install `isomorph-web` using npm or yarn.
+
+```
+yarn add isomorph-web
+
+// or
+
+npm i --save isomorph-web
+```
+
+Create an `src` folder, this will house all your components, utils and project related JavaScript code. Inside it create a `pages` folder that will house your page files and have React components associated with them.
+
+Check the [Required Project Structure](#required-project-structure) section to know the sample structure of isomorph projects.
+
+Update your package.json file's `scripts` to the following:
+
+```diff
+"scripts": {
++ 	"build": "isomorph-web build",
++ 	"dev": "isomorph-web dev",
++ 	"start": "isomorph-web start"
+}
+```
+
+Once done, run the dev server using:
+
+```
+npm run dev
+```
 
 ### Required Project Structure
 
@@ -51,7 +92,7 @@ Pages are simple React component files that expose a default React component exp
 
 ```javascript
 // No need to 'import React from "react";', it's always in scope.
-import useInitialData from "isomorph/hooks/useInitialData";
+import useInitialData from "isomorph-web/package/hooks/useInitialData";
 
 const PageComponent = () => {
 	const initialData = useInitialData(); // Use this hook to access data fetched for the page in getPropsOnServer/getStaticProps.
@@ -165,6 +206,20 @@ const ErrorComponent = ({ statusCode, error }) => {
 };
 
 export default ErrorComponent;
+```
+
+### Building and Serving on Production
+
+Use the following command to compile your source code to production config.
+
+```
+npm run build
+```
+
+Use the following to start the server.
+
+```
+npm run start
 ```
 
 ---

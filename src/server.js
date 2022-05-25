@@ -6,6 +6,7 @@ import React from "react";
 import { renderToString } from "react-dom/server";
 import cookieParser from "cookie-parser";
 import { outputFile, readFileSync } from "fs-extra";
+import { resolve } from "path";
 
 global.React = React; // To be in scope by default for all pages. Without having to import React each time.
 
@@ -45,8 +46,10 @@ app.get("*", async (req, res) => {
 	}`;
 	let ComponentExports;
 	try {
-		ComponentExports = await import(`./${pageImportPath}`);
-	} catch {
+		ComponentExports = await import(
+			resolve(process.cwd(), `./.isomorph/${pageImportPath}`)
+		);
+	} catch (err) {
 		const { default: sendBackErrorResponse } = await import(
 			"./utils/sendBackErrorResponse"
 		);
@@ -60,7 +63,10 @@ app.get("*", async (req, res) => {
 				// Follow the Stale-While-Revalidate approach, serve the static HTML saved first.
 				// Then later on, create the page and store the HTML back to the cache.
 				const cachedHtmlContentForStaticPage = readFileSync(
-					`./.isomorph/staticpages/${pageImportPath}.html`,
+					resolve(
+						process.cwd(),
+						`./.isomorph/staticpages/${pageImportPath}.html`
+					),
 					{ encoding: "utf-8" }
 				);
 				res.send(cachedHtmlContentForStaticPage);
@@ -153,7 +159,10 @@ app.get("*", async (req, res) => {
 		if (isStaticPage) {
 			// Write new HTML generated for this page to cache.
 			outputFile(
-				`./.isomorph/staticpages/${pageImportPath}.html`,
+				resolve(
+					process.cwd(),
+					`./.isomorph/staticpages/${pageImportPath}.html`
+				),
 				pageHTMLGenerated
 			);
 		}

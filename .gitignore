@@ -1,3 +1,5 @@
 node_modules
 .isomorph
 .env
+package
+src/pages
