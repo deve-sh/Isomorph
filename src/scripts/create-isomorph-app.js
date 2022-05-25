@@ -46,7 +46,7 @@ export default IndexPage;`,
 	},
 ];
 
-function generateStratifyProject() {
+function generateIsomorphProject() {
 	let directoryName = process.argv[2];
 	const appName = process.argv[3] || "isomorph-boilerplate";
 
@@ -86,4 +86,4 @@ function generateStratifyProject() {
 	console.log("Successfully generated isomorph project.");
 }
 
-generateStratifyProject();
+generateIsomorphProject();
