@@ -45,18 +45,17 @@ app.get("*", async (req, res) => {
 		pageRoute.endsWith("/") ? pageRoute + "index" : pageRoute
 	}`;
 	let ComponentExports;
-	try {
-		ComponentExports = await import(
-			resolve(process.cwd(), `./.isomorph/${pageImportPath}`)
-		);
-		console.log("Working with Imported Page Module: ", ComponentExports);
-	} catch (err) {
-		console.error("Error In Importing Page Module: ", err);
-		const { default: sendBackErrorResponse } = await import(
-			"./utils/sendBackErrorResponse"
-		);
-		return sendBackErrorResponse(res, 404, "Page Not Found");
-	}
+	ComponentExports = await import(
+		resolve(process.cwd(), `./.isomorph/${pageImportPath}`)
+	);
+	console.log("Working with Imported Page Module: ", ComponentExports);
+	// } catch (err) {
+	// 	console.error("Error In Importing Page Module: ", err);
+	// 	const { default: sendBackErrorResponse } = await import(
+	// 		"./utils/sendBackErrorResponse"
+	// 	);
+	// 	return sendBackErrorResponse(res, 404, "Page Not Found");
+	// }
 	try {
 		const isStaticPage =
 			!ComponentExports.getPropsOnServer || ComponentExports.getStaticProps;
