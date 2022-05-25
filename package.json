@@ -1,5 +1,5 @@
 {
-	"name": "isomorph",
+	"name": "isomorph-web",
 	"version": "1.0.0",
 	"description": "",
 	"main": "src/server.js",
