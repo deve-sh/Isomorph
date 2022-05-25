@@ -47,7 +47,7 @@ app.get("*", async (req, res) => {
 	let ComponentExports;
 	try {
 		ComponentExports = await import(
-			resolve(process.cwd(), `./${pageImportPath}`)
+			resolve(process.cwd(), `./.isomorph/${pageImportPath}`)
 		);
 	} catch {
 		const { default: sendBackErrorResponse } = await import(
