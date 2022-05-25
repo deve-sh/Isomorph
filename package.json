@@ -1,11 +1,12 @@
 {
 	"name": "isomorph-web",
-	"version": "1.0.5",
+	"version": "1.0.7",
 	"description": "",
 	"main": "src/server.js",
 	"scripts": {
 		"build:package": "babel ./src --out-dir ./package",
-		"build:watch": "babel --watch ./src --out-dir ./.isomorph",
+		"publish-package": "npm run build:package && npm publish",
+		"build:watch": "babel --watch ./src --out-dir ./package",
 		"dev": "concurrently \"npm run build:watch\" \"nodemon ./package/server.js\"",
 		"start": "node ./package/server.js"
 	},
