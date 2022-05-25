@@ -1,5 +1,5 @@
 processes
-src
+src/*
 node_modules
 .isomorph
 package/pages

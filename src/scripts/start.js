@@ -1,7 +1,6 @@
 const startCommand = () => {
 	const { execSync } = require("child_process");
-	const { resolve } = require("path");
-	execSync(`node ${resolve(process.cwd(), "./.isomorph/server.js")}`, {
+	execSync(`node ./node_modules/isomorph-web/package/server.js`, {
 		stdio: "inherit",
 	});
 };
