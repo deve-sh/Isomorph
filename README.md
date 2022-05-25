@@ -29,6 +29,19 @@ A simple framework inspired by [Next.js](https://nextjs.org/) to create Server a
 
 ### Installation and Setup
 
+#### Using `create-isomorph-app`
+
+The simplest way to get started with an isomorph project is using `create-isomorph-app`.
+
+```
+npx create-isomorph-app [project directory] [?project name]
+
+// ex:
+npx create-isomorph-app my-isomorph-project "Isomorph App"
+```
+
+#### Setting Up Manually
+
 As of now to setup an isomorph project, create a directory for your project. I'm assuming you have npm and Node.js already installed.
 
 ```
