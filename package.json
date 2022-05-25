@@ -4,10 +4,10 @@
 	"description": "",
 	"main": "src/server.js",
 	"scripts": {
-		"build": "babel ./src --out-dir ./.isomorph",
+		"build:package": "babel ./src --out-dir ./package",
 		"build:watch": "babel --watch ./src --out-dir ./.isomorph",
-		"dev": "concurrently \"npm run build:watch\" \"nodemon ./.isomorph/server.js\"",
-		"start": "node ./.isomorph/server.js"
+		"dev": "concurrently \"npm run build:watch\" \"nodemon ./package/server.js\"",
+		"start": "node ./package/server.js"
 	},
 	"keywords": [],
 	"author": "",
