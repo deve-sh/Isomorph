@@ -20,6 +20,7 @@ A simple framework inspired by [Next.js](https://nextjs.org/) to create Server a
 
 - Server Side Rendering with data fetching on the server.
 - Static Page Generation and serving with revalidation and `Stale-While-Revalidate` approach of handling serving.
+- Server Side data fetching utilities like `getDataOnServer` and `getStaticProps` and function to populate page meta data with `getPageMeta`.
 - Full Client-Side Rendering/Hydration of pages to enable user interactivity and events.
 - `useInitialData` hook to access initial data fetched on the server across the entire component chain.
 - All Environment variables accessible on server-side and variables starting `ISOMORPH_PUBLIC_...` accessible on the client-side.
