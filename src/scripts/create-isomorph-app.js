@@ -19,7 +19,7 @@ const packageJSONContent = (appName = "") => `{
 	  "start": "isomorph-web start"
 	},
 	"dependencies": {
-		"isomorph-web": "^1.3.0"
+		"isomorph-web": "^1.3.1"
 	},
 	"keywords": [],
 	"author": "",
