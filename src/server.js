@@ -38,7 +38,10 @@ app.use(cookieParser());
 const isProd = process.env.NODE_ENV === "production";
 const isDev = !isProd;
 
-app.use("/chunks", express.static(".isomorph/page-chunks"));
+app.use(
+	"/chunks",
+	express.static(resolve(process.cwd(), "./.isomorph/page-chunks"))
+);
 
 app.get("*", async (req, res) => {
 	const pageRoute = req.url;
