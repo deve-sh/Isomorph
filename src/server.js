@@ -20,6 +20,7 @@ import generatePageMetaHTML from "./utils/generatePageMetaHTML";
 import pageClientSideBundleExists from "./utils/pageClientSideBundleExists";
 import writeClientSidePageBundle from "./utils/writeClientSidePageBundle";
 import processPublicEnvVars from "./utils/processPublicEnvVars";
+import pageFileExists from "./utils/pageFileExists";
 
 const babelConfig = require("../babel.config.json");
 
@@ -44,18 +45,20 @@ app.get("*", async (req, res) => {
 	const pageImportPath = `pages${
 		pageRoute.endsWith("/") ? pageRoute + "index" : pageRoute
 	}`;
-	let ComponentExports;
-	try {
-		ComponentExports = await import(
-			resolve(process.cwd(), `./.isomorph/${pageImportPath}`)
-		);
-	} catch (err) {
+	// Send 404 response if page file does not exist.
+	const pageRelativePath = resolve(
+		process.cwd(),
+		`./.isomorph/${pageImportPath}`
+	);
+	const pageFilePresent = await pageFileExists(pageRelativePath);
+	if (!pageFilePresent) {
 		const { default: sendBackErrorResponse } = await import(
 			"./utils/sendBackErrorResponse"
 		);
 		return sendBackErrorResponse(res, 404, "Page Not Found");
 	}
 	try {
+		const ComponentExports = await import(pageRelativePath);
 		const isStaticPage =
 			!ComponentExports.getPropsOnServer || ComponentExports.getStaticProps;
 		if (isStaticPage && isProd) {
