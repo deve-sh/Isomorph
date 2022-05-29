@@ -1,8 +1,12 @@
 const fs = require("fs-extra");
+const { resolve } = require("path");
 
 const writePageBundle = (pageImportPath, bundle) => {
 	try {
-		fs.outputFileSync(`.isomorph/page-chunks/${pageImportPath}.js`, bundle);
+		fs.outputFileSync(
+			resolve(process.cwd(), `./.isomorph/page-chunks/${pageImportPath}.js`),
+			bundle
+		);
 		return true;
 	} catch (err) {
 		console.log(err);
