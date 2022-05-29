@@ -1,6 +1,6 @@
 import { existsSync } from "fs-extra";
 
-const pageFileExists = (pageFilePath) => {
+const pageFileExists = async (pageFilePath) => {
 	const pageFilePossibleNames = [
 		`${pageFilePath}.js`,
 		`${pageFilePath}.ts`,
@@ -11,7 +11,9 @@ const pageFileExists = (pageFilePath) => {
 	const checkForFileExistence = (filePath) =>
 		new Promise((resolve) => resolve(existsSync(filePath)));
 
-    return (await Promise.all(pageFilePossibleNames.map(checkForFileExistence))).some(exists => exists);
+	return (
+		await Promise.all(pageFilePossibleNames.map(checkForFileExistence))
+	).some((exists) => exists);
 };
 
 export default pageFileExists;
