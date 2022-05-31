@@ -6,7 +6,7 @@
 	"scripts": {
 		"build:package": "babel ./src --extensions \".tsx,.js,.jsx,.ts,.json\" --out-dir ./package",
 		"publish-package": "npm run build:package && npm publish",
-		"build:watch": "babel --watch ./src --out-dir ./package",
+		"build:watch": "babel --watch ./src --extensions \".tsx,.js,.jsx,.ts,.json\" --out-dir ./package",
 		"dev": "concurrently \"npm run build:watch\" \"nodemon ./package/server.js\"",
 		"start": "node ./package/server.js"
 	},
