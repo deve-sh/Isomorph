@@ -2,6 +2,8 @@
 
 A simple framework inspired by [Next.js](https://nextjs.org/) to create Server and Statically Rendered React Apps.
 
+Read the [blog post](https://blog.devesh.tech/post/framework-for-creating-isomorphic-react-apps) detailing the process of ideation and creation of this project.
+
 - [Starting An Isomorph Project](#installation-and-setup)
 - [Required Project Structure](#required-project-structure)
 - [Pages Structure and Data Fetching](#pages-structure-and-data-fetching)
@@ -13,7 +15,6 @@ A simple framework inspired by [Next.js](https://nextjs.org/) to create Server a
 
 #### Work In Progress
 
-- Converting this to an installable package as well as CLI with options to sccafold a project with a command like `create-isomorph-app`.
 - Supporting dynamic page routes.
 
 ### Existing Features
