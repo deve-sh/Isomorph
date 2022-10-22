@@ -185,7 +185,9 @@ app.all("*", async (req, res) => {
 	} catch (err) {
 		if (res.headersSent) return;
 
-		const { default: errorResponse } = await import("./utils/errorResponse");
+		const { default: errorResponse } = await import(
+			"./utils/sendBackErrorResponse"
+		);
 		return errorResponse(res, 500, err.message);
 	}
 });
