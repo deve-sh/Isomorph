@@ -43,7 +43,7 @@ app.use(
 	express.static(resolve(process.cwd(), "./.isomorph/page-chunks"))
 );
 
-app.get("*", async (req, res) => {
+app.all("*", async (req, res) => {
 	const pageRoute = req.url;
 	const pageImportPath = `pages${
 		pageRoute.endsWith("/") ? pageRoute + "index" : pageRoute
@@ -55,13 +55,22 @@ app.get("*", async (req, res) => {
 	);
 	const pageFilePresent = await pageFileExists(pageRelativePath);
 	if (!pageFilePresent) {
-		const { default: sendBackErrorResponse } = await import(
+		const { default: errorResponse } = await import(
 			"./utils/sendBackErrorResponse"
 		);
-		return sendBackErrorResponse(res, 404, "Page Not Found");
+		return errorResponse(res, 404, "Page Not Found");
 	}
 	try {
 		const ComponentExports = await import(pageRelativePath);
+
+		// Handling API Routes
+		if (pageRoute.startsWith("/api")) {
+			const APIController = ComponentExports.default;
+			if (!APIController)
+				return errorResponse(res, 404, "No API Controller provided");
+			return APIController(req, res);
+		}
+
 		const isStaticPage =
 			!ComponentExports.getPropsOnServer || ComponentExports.getStaticProps;
 		if (isStaticPage && isProd) {
@@ -176,10 +185,8 @@ app.get("*", async (req, res) => {
 	} catch (err) {
 		if (res.headersSent) return;
 
-		const { default: sendBackErrorResponse } = await import(
-			"./utils/sendBackErrorResponse"
-		);
-		return sendBackErrorResponse(res, 500, err.message);
+		const { default: errorResponse } = await import("./utils/errorResponse");
+		return errorResponse(res, 500, err.message);
 	}
 });
 
