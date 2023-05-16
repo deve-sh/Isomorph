@@ -1,8 +1,9 @@
 {
 	"name": "isomorph-web",
-	"version": "1.4.1",
+	"version": "1.4.2",
 	"description": "",
 	"main": "package/server.js",
+	"repository": "https://github.com/deve-sh/isomorph",
 	"scripts": {
 		"build:package": "babel ./src --extensions \".tsx,.js,.jsx,.ts,.json\" --out-dir ./package",
 		"publish-package": "npm run build:package && npm publish",

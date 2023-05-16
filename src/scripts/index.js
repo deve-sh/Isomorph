@@ -3,7 +3,7 @@
 const commandType = process.argv[2];
 
 if (!commandType || !["dev", "build", "start"].includes(commandType)) {
-	console.log("Use isomporhic dev/build/start for appropriate action.");
+	console.log("Use isomporh-web dev/build/start for appropriate action.");
 	process.exit(-1);
 }
 
