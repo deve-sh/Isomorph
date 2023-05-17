@@ -1,7 +1,7 @@
 {
 	"name": "isomorph-web",
-	"version": "1.4.2",
-	"description": "",
+	"version": "1.4.3",
+	"description": "A React SSR and SSG framework inspired by Next.js",
 	"main": "package/server.js",
 	"repository": "https://github.com/deve-sh/isomorph",
 	"scripts": {
@@ -11,8 +11,10 @@
 		"dev": "concurrently \"npm run build:watch\" \"nodemon ./package/server.js\"",
 		"start": "node ./package/server.js"
 	},
-	"keywords": [],
-	"author": "",
+	"keywords": [
+		"Isomorphic Web Apps Framework"
+	],
+	"author": "Devesh Kumar",
 	"license": "MIT",
 	"dependencies": {
 		"@babel/cli": "^7.17.10",
