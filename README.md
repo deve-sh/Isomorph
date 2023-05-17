@@ -36,6 +36,7 @@ Read the [blog post](https://blog.devesh.tech/post/framework-for-creating-isomor
 The simplest way to get started with an isomorph project is using `create-isomorph-app`.
 
 ```
+npm i -g isomorph-web
 npx create-isomorph-app [project directory] [?project name]
 
 // ex:
